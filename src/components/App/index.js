@@ -11,6 +11,7 @@ class App extends React.Component {
       isLoading: true,
       filter: '',
     }
+    this.handlerFilter = this.handlerFilter.bind(this)
   }
   componentDidMount() {
     fetch('https://pokeapi.co/api/v2/pokemon/?limit=25')
@@ -45,12 +46,16 @@ class App extends React.Component {
   });
   }
 
+  handlerFilter(e) {
+    this.setState({filter: e.target.value});
+  }
+
   render() {
-    const {allPokemon, isLoading}= this.state;
+    const {allPokemon, isLoading, filter}= this.state;
     return (
       <div className="App">
-        <Filter/>
-        {isLoading? <p>Loading...</p> : <List pokemons={allPokemon}/>}
+        <Filter handler={this.handlerFilter} value={filter}/>
+        {isLoading? <p>Loading...</p> : <List pokemons={allPokemon} filter={filter}/>}
       </div>
     );
   }

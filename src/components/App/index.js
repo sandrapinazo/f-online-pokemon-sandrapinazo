@@ -30,6 +30,8 @@ class App extends React.Component {
         .then(data => {
           const evolves = data.evolves_from_species;
           evolves? thisPokemon.evolvesFrom= evolves.name : thisPokemon.evolvesFrom= 'none';
+          const evChain = data.evolution_chain.url;
+          evChain? thisPokemon.evsUrl= evChain : thisPokemon.evsUrl= 'none';
           return thisPokemon;
         })
       }

@@ -1,13 +1,14 @@
-import React from 'react';
+import React from 'react'
 import Filter from '../Filter'
-import './styles.scss';
+import List from '../List'
+import './styles.scss'
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       allPokemon: [],
-
+      isLoading: true,
       filter: '',
     }
   }
@@ -16,21 +17,40 @@ class App extends React.Component {
   .then(response => response.json())
   .then(data => {
     const pokemons = data.results;
-    const pokemonData = pokemons.map(pokemon => fetch(pokemon.url)
+    const pokemonData = pokemons.map(pokemon => {
+      let thisPokemon = {};
+      return fetch(pokemon.url)
         .then(response => response.json())
+        .then(dataPkm => {
+          thisPokemon = dataPkm;
+          return fetch(dataPkm.species.url)
+        })
+        .then(response => response.json())
+        .then(data => {
+          const evolves = data.evolves_from_species;
+          evolves? thisPokemon.evolvesFrom= evolves.name : thisPokemon.evolvesFrom= 'none';
+          return thisPokemon;
+        })
+      }
     );
 
     Promise.all(pokemonData)
       .then(responses => {
-        this.setState({allPokemon: responses})
+        console.log(responses);
+        this.setState({
+          allPokemon: responses,
+          isLoading: false,
+        })
       });    
   });
   }
 
   render() {
+    const {allPokemon, isLoading}= this.state;
     return (
       <div className="App">
         <Filter/>
+        {isLoading? <p>Loading...</p> : <List pokemons={allPokemon}/>}
       </div>
     );
   }

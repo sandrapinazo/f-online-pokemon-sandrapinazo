@@ -1,13 +1,15 @@
-import React from 'react'
-import Filter from '../Filter'
-import List from '../List'
-import './styles.scss'
+import React from 'react';
+import { Route, Switch } from "react-router-dom";
+import Filter from '../Filter';
+import List from '../List';
+import Details from '../Details';
+import './styles.scss';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      allPokemon: [],
+      allPokemons: [],
       isLoading: true,
       filter: '',
     }
@@ -41,7 +43,7 @@ class App extends React.Component {
       .then(responses => {
         console.log(responses);
         this.setState({
-          allPokemon: responses,
+          allPokemons: responses,
           isLoading: false,
         })
       });    
@@ -53,11 +55,35 @@ class App extends React.Component {
   }
 
   render() {
-    const {allPokemon, isLoading, filter}= this.state;
+    const {allPokemons, isLoading, filter}= this.state;
     return (
       <div className="App">
-        <Filter handler={this.handlerFilter} value={filter}/>
-        {isLoading? <p>Loading...</p> : <List pokemons={allPokemon} filter={filter}/>}
+        <Switch>
+          <Route
+            exact path ="/"
+            render = { routerProps => (
+              <React.Fragment>
+                <Filter handler={this.handlerFilter} value={filter}/>
+                {isLoading
+                  ? <p>Loading...</p>
+                  : <List pokemons={allPokemons.filter(pokemon => pokemon.name.toUpperCase().includes(filter.toUpperCase()))}/>
+                }
+              </React.Fragment>
+            )}
+          />
+          <Route
+              path="/:id"
+              render={routerProps => {
+                return (
+                  <Details
+                    data={allPokemons.find(
+                      item => item.id === parseInt(routerProps.match.params.id)
+                    )}
+                  />
+                );
+              }}
+            />
+        </Switch>
       </div>
     );
   }

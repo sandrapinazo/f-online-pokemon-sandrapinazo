@@ -3,6 +3,7 @@ import { Route, Switch } from "react-router-dom";
 import Filter from '../Filter';
 import List from '../List';
 import Details from '../Details';
+import { fetchData } from '../../services/getInitialData'
 import './styles.scss';
 
 class App extends React.Component {
@@ -17,38 +18,37 @@ class App extends React.Component {
     this.handlerFilter = this.handlerFilter.bind(this)
   }
   componentDidMount() {
-    fetch('https://pokeapi.co/api/v2/pokemon/?limit=25')
-  .then(response => response.json())
-  .then(data => {
-    const pokemons = data.results;
-    const pokemonData = pokemons.map(pokemon => {
-      let thisPokemon = {};
-      return fetch(pokemon.url)
-        .then(response => response.json())
-        .then(dataPkm => {
-          thisPokemon = dataPkm;
-          return fetch(dataPkm.species.url)
+    fetchData()
+    .then(data => {
+      const pokemons = data.results;
+      const pokemonData = pokemons.map(pokemon => {
+        let thisPokemon = {};
+        return fetch(pokemon.url)
+          .then(response => response.json())
+          .then(dataPkm => {
+            thisPokemon = dataPkm;
+            return fetch(dataPkm.species.url)
+          })
+          .then(response => response.json())
+          .then(data => {
+            const evolves = data.evolves_from_species;
+            evolves? thisPokemon.evolvesFrom= evolves.name : thisPokemon.evolvesFrom= 'none';
+            const evChain = data.evolution_chain.url;
+            evChain? thisPokemon.evsUrl= evChain : thisPokemon.evsUrl= 'none';
+            return thisPokemon;
+          })
+        }
+      )
+      
+      Promise.all(pokemonData)
+      .then(responses => {
+        this.setState({
+          allPokemons: responses,
+          isLoading: false,
         })
-        .then(response => response.json())
-        .then(data => {
-          const evolves = data.evolves_from_species;
-          evolves? thisPokemon.evolvesFrom= evolves.name : thisPokemon.evolvesFrom= 'none';
-          const evChain = data.evolution_chain.url;
-          evChain? thisPokemon.evsUrl= evChain : thisPokemon.evsUrl= 'none';
-          return thisPokemon;
-        })
-      }
-    )
-    
-    Promise.all(pokemonData)
-    .then(responses => {
-      this.setState({
-        allPokemons: responses,
-        isLoading: false,
-      })
-    });    
-  })
-  .catch(error => this.setState({fetchError: error}));
+      });    
+    })
+    .catch(error => this.setState({fetchError: error}));
   }
 
   handlerFilter(e) {

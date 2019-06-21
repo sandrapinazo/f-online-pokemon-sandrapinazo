@@ -7,6 +7,7 @@ class Details extends React.Component {
         super(props);
         this.state= {
             evolutions: '',
+            fetchError: '',
         }
         this.fetchEvols = this.fetchEvols.bind(this);
         this.checkEvs = this.checkEvs.bind(this);
@@ -25,6 +26,7 @@ class Details extends React.Component {
             });
 
         })
+        .catch(error => this.setState({fetchError: error}));
     }
         
     checkEvs(acc, location){
@@ -40,7 +42,7 @@ class Details extends React.Component {
         const pokemonData = this.props.data;            
         if (pokemonData) {
             const {name, sprites, abilities, height, weight}= pokemonData;
-            const evolutions = this.state.evolutions;
+            const {evolutions, fetchError} = this.state;
             if(!this.state.evolutions){this.fetchEvols(pokemonData)};
             return (   <div>
                         <img src={sprites.front_default} alt={name} />
@@ -54,7 +56,7 @@ class Details extends React.Component {
                             );
                         })}
                         </ul>
-                        <p>Evolution chain: { evolutions.length? evolutions.reduce((acc,evolution)=> acc += ` << ${evolution}`) : 'Loading...' }</p>   
+                        <p>Evolution chain: { fetchError?  'An error occured.' : evolutions.length? evolutions.reduce((acc,evolution)=> acc += ` << ${evolution}`) : 'Loading...' }</p>   
                         <Link to='/'>༄  Go back</Link>
                     </div> );
         } else {

@@ -9,6 +9,7 @@ class Details extends React.Component {
             evolutions: '',
         }
         this.fetchEvols = this.fetchEvols.bind(this);
+        this.checkEvs = this.checkEvs.bind(this);
     }
     
     fetchEvols(data) {
@@ -16,22 +17,31 @@ class Details extends React.Component {
         .then(response => response.json())
         .then(data => {
             const evolutionChain = [data.chain.species.name];
-            evolutionChain.push(data.chain.evolves_to[0].species.name);
-            evolutionChain.push(data.chain.evolves_to[0].evolves_to[0].species.name);
+            this.checkEvs(evolutionChain, data.chain.evolves_to[0]);
+            console.log(data.chain.evolves_to[0]);
+
             this.setState({
                 evolutions: evolutionChain,
             });
+
         })
     }
         
-    
+    checkEvs(acc, location){
+        console.log(location);
+       if (location) {
+           console.log(location.species.name);
+           acc.push(location.species.name);
+           this.checkEvs(acc, location.evolves_to[0]);
+       }
+    }
 
     render() {
         const pokemonData = this.props.data;            
         if (pokemonData) {
             const {name, sprites, abilities, height, weight}= pokemonData;
             const evolutions = this.state.evolutions;
-            this.fetchEvols(pokemonData);
+            if(!this.state.evolutions){this.fetchEvols(pokemonData)};
             return (   <div>
                         <img src={sprites.front_default} alt={name} />
                         <h1>{name}</h1>
@@ -44,7 +54,7 @@ class Details extends React.Component {
                             );
                         })}
                         </ul>
-                        <p>Evolution chain: {evolutions? `${evolutions[0]} >> ${evolutions[1]} >> ${evolutions[2]}` : 'Loading...' }</p>   
+                        <p>Evolution chain: { evolutions.length? evolutions.reduce((acc,evolution)=> acc += ` << ${evolution}`) : 'Loading...' }</p>   
                         <Link to='/'>༄  Go back</Link>
                     </div> );
         } else {

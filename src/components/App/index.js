@@ -12,6 +12,7 @@ class App extends React.Component {
       allPokemons: [],
       isLoading: true,
       filter: '',
+      fetchError: '',
     }
     this.handlerFilter = this.handlerFilter.bind(this)
   }
@@ -37,17 +38,17 @@ class App extends React.Component {
           return thisPokemon;
         })
       }
-    );
-
+    )
+    
     Promise.all(pokemonData)
-      .then(responses => {
-        console.log(responses);
-        this.setState({
-          allPokemons: responses,
-          isLoading: false,
-        })
-      });    
-  });
+    .then(responses => {
+      this.setState({
+        allPokemons: responses,
+        isLoading: false,
+      })
+    });    
+  })
+  .catch(error => this.setState({fetchError: error}));
   }
 
   handlerFilter(e) {
@@ -55,7 +56,7 @@ class App extends React.Component {
   }
 
   render() {
-    const {allPokemons, isLoading, filter}= this.state;
+    const {allPokemons, isLoading, filter, fetchError}= this.state;
     return (
       <div className="App">
         <Switch>
@@ -64,9 +65,11 @@ class App extends React.Component {
             render = { routerProps => (
               <React.Fragment>
                 <Filter handler={this.handlerFilter} value={filter}/>
-                {isLoading
-                  ? <p>Loading...</p>
-                  : <List pokemons={allPokemons.filter(pokemon => pokemon.name.toUpperCase().includes(filter.toUpperCase()))}/>
+                {fetchError
+                  ? 'An error occured.' 
+                  :isLoading
+                    ? <p>Loading...</p>
+                    : <List pokemons={allPokemons.filter(pokemon => pokemon.name.toUpperCase().includes(filter.toUpperCase()))}/>
                 }
               </React.Fragment>
             )}

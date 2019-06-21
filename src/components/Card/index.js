@@ -17,7 +17,7 @@ function Card(props) {
             );
           })}
         </ul>
-        <p>Evolves from: {evolves}</p>
+        {evolves !== 'none'? <p>Evolves from: {evolves}</p> : <p> </p> }
       </div>
     );
 }

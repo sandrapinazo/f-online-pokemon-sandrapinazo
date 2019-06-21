@@ -44,20 +44,22 @@ class Details extends React.Component {
             const {name, sprites, abilities, height, weight}= pokemonData;
             const {evolutions, fetchError} = this.state;
             if(!this.state.evolutions){this.fetchEvols(pokemonData)};
-            return (   <div>
+            return ( <div>
                         <img src={sprites.front_default} alt={name} />
                         <h1>{name}</h1>
                         <p>Height: {height} | Weight: {weight}</p>
                         <p>Abilities:</p>
                         <ul>
-                        {abilities.map((item, index) => {
-                            return (
-                                <li key={index+1}>{item.ability.name}</li>
-                            );
-                        })}
+                            {abilities.map((item, index) => {
+                                return (
+                                    <li key={index+1}>{item.ability.name}</li>
+                                );
+                            })}
                         </ul>
-                        <p>Evolution chain: { fetchError?  'An error occured.' : evolutions.length? evolutions.reduce((acc,evolution)=> acc += ` << ${evolution}`) : 'Loading...' }</p>   
-                        <Link to='/'>༄  Go back</Link>
+                        <p>
+                            Evolution chain: { fetchError?  'An error occured.' : evolutions.length? evolutions.reduce((acc,evolution)=> acc += ` << ${evolution}`) : 'Loading...' }
+                        </p>   
+                        <Link to='/'>{`<< Go back`}</Link>
                     </div> );
         } else {
             return 'Loading...' 

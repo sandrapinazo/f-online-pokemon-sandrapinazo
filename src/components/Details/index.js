@@ -61,8 +61,9 @@ class Details extends React.Component {
         if (pokemonData) {
             const {name, sprites, abilities, height, weight}= pokemonData;
             const {evolutions, evolutionsImgs, fetchError, fetchImgError, isLoading} = this.state;
+            const animation = isLoading? 'No' : 'Animate';
             if(!this.state.evolutions){this.fetchEvols(pokemonData)};
-            return ( <div className='Details_card' >
+            return ( <div className={`Details_card ${animation}`} >
                         <Link className='Back' to='/'><FontAwesomeIcon icon={faArrowLeft} /></Link>
                         <img className='Space' src={sprites.front_default} alt={name} />
                         <img src={sprites.back_default} alt={name} />

@@ -1,0 +1,52 @@
+@import '../../scss/variables.scss';
+
+.Details_card {
+    padding: 25px 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #fff;
+    border: 1px solid $color-border;
+    border-radius: 2px;
+    box-shadow: 0px 0px 100px rgba(0,0,0, 0.3);
+}
+
+.Back {
+    display: block;
+    text-align: left;
+    font-size: 25px;
+}
+
+.Icon {
+    margin: 0 10px;
+    text-align: left;
+    font-size: 20px;
+}
+.Space {
+    margin: 0 20px;
+}
+.Title {
+    border-bottom: 1px solid black;
+    text-align: left;
+}
+
+.Abilities_list {
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.Ability {
+    padding: 10px;
+    font-size: 10px;
+    margin: 3px;
+    padding: 5px;
+    border: 1px solid #D9D1C9;
+    border-radius: 7px;
+    color: black;
+    text-transform: uppercase;
+}

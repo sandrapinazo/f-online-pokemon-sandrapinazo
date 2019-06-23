@@ -1,6 +1,8 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import './styles.scss'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faRuler, faWeight, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import './styles.scss';
 
 class Details extends React.Component {
     constructor(props) {
@@ -17,22 +19,17 @@ class Details extends React.Component {
         fetch(this.props.data.evsUrl)
         .then(response => response.json())
         .then(data => {
-            const evolutionChain = [data.chain.species.name];
+            const evolutionChain = [[data.chain.species.name]];
             this.checkEvs(evolutionChain, data.chain.evolves_to[0]);
-            console.log(data.chain.evolves_to[0]);
-
             this.setState({
                 evolutions: evolutionChain,
             });
-
         })
         .catch(error => this.setState({fetchError: error}));
     }
         
     checkEvs(acc, location){
-        console.log(location);
        if (location) {
-           console.log(location.species.name);
            acc.push(location.species.name);
            this.checkEvs(acc, location.evolves_to[0]);
        }
@@ -44,22 +41,28 @@ class Details extends React.Component {
             const {name, sprites, abilities, height, weight}= pokemonData;
             const {evolutions, fetchError} = this.state;
             if(!this.state.evolutions){this.fetchEvols(pokemonData)};
-            return ( <div>
-                        <img src={sprites.front_default} alt={name} />
+            return ( <div className='Details_card' >
+                        <Link className='Back' to='/'><FontAwesomeIcon icon={faArrowLeft} /></Link>
+                        <img className='Space' src={sprites.front_default} alt={name} />
+                        <img src={sprites.back_default} alt={name} />
                         <h1>{name}</h1>
-                        <p>Height: {height} | Weight: {weight}</p>
-                        <p>Abilities:</p>
-                        <ul>
+                        <span className='Space' ><FontAwesomeIcon className='Icon' icon={faRuler} /> {height} </span>
+                        <span className='Space' ><FontAwesomeIcon className='Icon' icon={faWeight} /> {weight}</span>
+                        <p className='Title'>Abilities</p>
+                        <ul className='Abilities_list'>
                             {abilities.map((item, index) => {
                                 return (
-                                    <li key={index+1}>{item.ability.name}</li>
+                                    <li key={index+1} className='Ability' >{item.ability.name}</li>
                                 );
                             })}
                         </ul>
-                        <p>
-                            Evolution chain: { fetchError?  'An error occured.' : evolutions.length? evolutions.reduce((acc,evolution)=> acc += ` << ${evolution}`) : 'Loading...' }
+                        <p className='Title'>Evolution chain:</p>
+                        <p>{ fetchError
+                                ?  'An error occured.' 
+                                : evolutions.length
+                            ? evolutions.reduce((acc, evolution, index)=> acc=[...acc, <span key={index+1}><FontAwesomeIcon className='Icon' icon={faArrowRight} />{evolution}</span>]) 
+                                    : 'Loading...' }
                         </p>   
-                        <Link to='/'>{`<< Go back`}</Link>
                     </div> );
         } else {
             return 'Loading...' 

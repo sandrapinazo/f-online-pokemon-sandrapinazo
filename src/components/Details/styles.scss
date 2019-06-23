@@ -17,6 +17,7 @@
     display: block;
     text-align: left;
     font-size: 25px;
+    color: black;
 }
 
 .Icon {
@@ -49,4 +50,13 @@
     border-radius: 7px;
     color: black;
     text-transform: uppercase;
+}
+
+.Evolutions_list {
+    margin: 0px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }

@@ -9,37 +9,58 @@ class Details extends React.Component {
         super(props);
         this.state= {
             evolutions: '',
+            evolutionsImgs: [],
             fetchError: '',
+            fetchImgError: '',
+            isLoading: true,
         }
         this.fetchEvols = this.fetchEvols.bind(this);
         this.checkEvs = this.checkEvs.bind(this);
+        this.fetchImg = this.fetchImg.bind(this);
     }
     
     fetchEvols(data) {
         fetch(this.props.data.evsUrl)
         .then(response => response.json())
         .then(data => {
-            const evolutionChain = [[data.chain.species.name]];
-            this.checkEvs(evolutionChain, data.chain.evolves_to[0]);
+            const evolutionChain = [];
+            const evolutionImg = [];
+            this.checkEvs(evolutionChain, evolutionImg, data.chain);
             this.setState({
                 evolutions: evolutionChain,
+                evolutionsImgs: evolutionImg, 
             });
         })
         .catch(error => this.setState({fetchError: error}));
     }
         
-    checkEvs(acc, location){
+    checkEvs(acc1,acc2, location){
        if (location) {
-           acc.push(location.species.name);
-           this.checkEvs(acc, location.evolves_to[0]);
+           acc1.push(location.species.name);
+           this.checkEvs(acc1,acc2, location.evolves_to[0]);
+           this.fetchImg(acc2,location);
+           
        }
+    }
+
+    fetchImg(acc2, location){
+        const arr= location.species.url.split('/');
+        const id= arr[arr.length-2];
+        const pkmUrl= `https://pokeapi.co/api/v2/pokemon/${id}/`;
+        fetch(pkmUrl)
+        .then(response => response.json())
+        .then(data => {
+            acc2.push(data.sprites.front_default);
+            this.setState({isLoading: false});
+        })
+        .catch(error => this.setState({fetchImgError: error}));
     }
 
     render() {
         const pokemonData = this.props.data;            
         if (pokemonData) {
             const {name, sprites, abilities, height, weight}= pokemonData;
-            const {evolutions, fetchError} = this.state;
+            const {evolutions, evolutionsImgs, fetchError, fetchImgError, isLoading} = this.state;
             if(!this.state.evolutions){this.fetchEvols(pokemonData)};
             return ( <div className='Details_card' >
                         <Link className='Back' to='/'><FontAwesomeIcon icon={faArrowLeft} /></Link>
@@ -62,7 +83,22 @@ class Details extends React.Component {
                                 : evolutions.length
                             ? evolutions.reduce((acc, evolution, index)=> acc=[...acc, <span key={index+1}><FontAwesomeIcon className='Icon' icon={faArrowRight} />{evolution}</span>]) 
                                     : 'Loading...' }
-                        </p>   
+                        </p>  
+                        <ul className='Evolutions_list'>
+                            { fetchImgError
+                                ? 'An error occured.'
+                                : !isLoading
+                                    ? evolutionsImgs
+                                        .sort()
+                                        .map((item, index) => {
+                                            return (
+                                                <li key={index+1} className='Space' >
+                                                    <img src={item} alt={name} />
+                                                </li>
+                                            );
+                                         })
+                                    : 'Loading...'}
+                        </ul> 
                     </div> );
         } else {
             return 'Loading...' 
